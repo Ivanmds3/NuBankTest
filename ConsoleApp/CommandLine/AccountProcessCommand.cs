@@ -10,16 +10,23 @@ namespace ConsoleApp.CommandLine
         public AccountProcessCommand(string commandLine) : base(commandLine) { }
         public void Do()
         {
-            var jsonOpt = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            try
+            {
+                var jsonOpt = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
-            var wrap = JsonSerializer.Deserialize<AccountWrap>(CommandLine, jsonOpt);
+                var wrap = JsonSerializer.Deserialize<AccountWrap>(CommandLine, jsonOpt);
 
-            var accountService = new AccountService();
-            var result = accountService.Create(wrap.Account);
+                var accountService = new AccountService();
+                var result = accountService.Create(wrap.Account);
 
-            wrap.Violations = result.Errors;
+                wrap.Violations = result.Errors;
 
-            Console.WriteLine($"{JsonSerializer.Serialize(wrap, jsonOpt)}\n");
+                Console.WriteLine($"{JsonSerializer.Serialize(wrap, jsonOpt)}\n");
+            }
+            catch (JsonException)
+            {
+                Console.WriteLine("Json format it's incorrect\n");
+            }
         }
     }
 }
